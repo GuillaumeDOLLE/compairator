@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestClient;
 
 @Configuration
-public class AiClientconfig {
+public class AiClientConfig {
 
     @Bean("groq")
     public RestClient groqRestClient(RestClient.Builder builder,

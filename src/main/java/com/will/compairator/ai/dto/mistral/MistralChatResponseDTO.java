@@ -5,8 +5,8 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class MistralChatResponse {
+public class MistralChatResponseDTO {
 
-    private List<MistralChoice> choices;
+    private List<MistralChoiceDTO> choices;
 
 }

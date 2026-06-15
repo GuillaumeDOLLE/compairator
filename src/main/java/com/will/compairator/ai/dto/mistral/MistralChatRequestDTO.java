@@ -1,6 +1,5 @@
-package com.will.compairator.ai.dto.groq;
-
-import com.will.compairator.ai.dto.Message;
+package com.will.compairator.ai.dto.mistral;
+import com.will.compairator.ai.dto.MessageDTO;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -14,12 +13,11 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class GroqChatRequest {
+public class MistralChatRequestDTO {
 
     @NotNull @NotBlank
     private String model;
 
     @NotNull @NotBlank
-    private List<Message> messages;
-
+    private List<MessageDTO> messages;
 }

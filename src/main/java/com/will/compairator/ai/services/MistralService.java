@@ -1,8 +1,8 @@
 package com.will.compairator.ai.services;
 
-import com.will.compairator.ai.dto.Message;
-import com.will.compairator.ai.dto.mistral.MistralChatRequest;
-import com.will.compairator.ai.dto.mistral.MistralChatResponse;
+import com.will.compairator.ai.dto.MessageDTO;
+import com.will.compairator.ai.dto.mistral.MistralChatRequestDTO;
+import com.will.compairator.ai.dto.mistral.MistralChatResponseDTO;
 import com.will.compairator.ai.enums.AiRole;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,31 +28,31 @@ public class MistralService {
         this.mistralRestClient = mistralRestClient;
     }
 
-    public MistralChatResponse chat(String prompt) {
-        MistralChatRequest request = buildRequest(prompt);
+    public MistralChatResponseDTO chat(String prompt) {
+        MistralChatRequestDTO request = buildRequest(prompt);
         return sendRequest(request);
     }
 
-    private MistralChatRequest buildRequest(String prompt) {
-        Message message = Message.builder()
-                .role(AiRole.USER.getValue())
+    private MistralChatRequestDTO buildRequest(String prompt) {
+        MessageDTO message = MessageDTO.builder()
+                .role(AiRole.USER.name().toLowerCase())
                 .content(prompt)
                 .build();;
 
-        return MistralChatRequest.builder()
+        return MistralChatRequestDTO.builder()
                 .model(mistralModel)
                 .messages(List.of(message))
                 .build();
 
     }
 
-    private MistralChatResponse sendRequest(MistralChatRequest request) {
+    private MistralChatResponseDTO sendRequest(MistralChatRequestDTO request) {
         return mistralRestClient.post()
                 .uri("/chat/completions")
                 .header("Authorization", "Bearer " + apiKey)
                 .body(request)
                 .retrieve()
-                .body(MistralChatResponse.class);
+                .body(MistralChatResponseDTO.class);
     }
 
 }

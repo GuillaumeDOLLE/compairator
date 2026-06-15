@@ -5,7 +5,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class GroqChatResponse {
+public class GroqChatResponseDTO {
 
     private List<GroqChoice> choices;
 

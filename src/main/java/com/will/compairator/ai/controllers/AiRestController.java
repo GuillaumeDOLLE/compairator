@@ -57,7 +57,7 @@ public class AiRestController {
                                       .build();
     }
 
-    @PostMapping("/compare")
+    @PostMapping("/chat/compare")
     public String compareView(@RequestParam String prompt, Model model) {
 
         String groqAnswer = groqService.chat(prompt)

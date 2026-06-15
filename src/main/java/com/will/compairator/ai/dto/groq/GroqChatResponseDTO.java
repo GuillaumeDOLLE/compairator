@@ -7,6 +7,6 @@ import java.util.List;
 @Data
 public class GroqChatResponseDTO {
 
-    private List<GroqChoice> choices;
+    private List<GroqChoiceDTO> choices;
 
 }

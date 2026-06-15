@@ -5,7 +5,7 @@ import com.will.compairator.ai.dto.MessageDTO;
 import lombok.Data;
 
 @Data
-public class GroqChoice {
+public class GroqChoiceDTO {
 
     private Integer index;
     private MessageDTO message;

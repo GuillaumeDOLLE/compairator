@@ -1,26 +1,23 @@
 package com.will.compairator.ai.controllers;
 
 import com.will.compairator.ai.dto.CompairatorDTO;
-import com.will.compairator.ai.dto.groq.GroqChatResponseDTO;
-import com.will.compairator.ai.dto.mistral.MistralChatResponseDTO;
-import com.will.compairator.ai.services.GroqService;
-import com.will.compairator.ai.services.MistralService;
+import com.will.compairator.ai.enums.AiProvider;
+import com.will.compairator.ai.services.AiService;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Slf4j
 @RestController
 @RequestMapping("/ai")
 public class AiRestController {
 
-    private final GroqService groqService;
-    private final MistralService mistralService;
+    private final AiService aiService;
 
-    public AiRestController(GroqService groqService,
-                            MistralService mistralService) {
-        this.groqService = groqService;
-        this.mistralService = mistralService;
+    public AiRestController(AiService aiService) {
+        this.aiService = aiService;
     }
 
     @GetMapping
@@ -29,51 +26,17 @@ public class AiRestController {
         return "OK GET";
     }
 
-    @PostMapping("/chat/groq")
-    public CompairatorDTO.ComparaitorChatResponseDTO chatWithGroq(@RequestBody CompairatorDTO.CompairatorChatRequestDTO request) {
-        GroqChatResponseDTO groqChatResponseDto = groqService.chat(request.getPrompt());
-
-        String content = groqChatResponseDto.getChoices()
-                                         .getFirst()
-                                         .getMessage()
-                                         .getContent();
-
-        return CompairatorDTO.ComparaitorChatResponseDTO.builder()
-                                      .content(content)
-                                      .build();
-    }
-
-    @PostMapping("/chat/mistral")
-    public CompairatorDTO.ComparaitorChatResponseDTO chatWithMistral(@RequestBody CompairatorDTO.CompairatorChatRequestDTO request) {
-        MistralChatResponseDTO mistralChatResponse = mistralService.chat(request.getPrompt());
-
-        String content = mistralChatResponse.getChoices()
-                .getFirst()
-                .getMessage()
-                .getContent();
-
-        return CompairatorDTO.ComparaitorChatResponseDTO.builder()
-                                      .content(content)
-                                      .build();
+    @PostMapping("/chat/{provider}")
+    public CompairatorDTO.ChatResponseDTO chatWithAi(
+            @PathVariable String provider,
+            @Valid @RequestBody CompairatorDTO.ChatRequestDTO promptRequest) {
+        AiProvider aiProvider = AiProvider.valueOf(provider.toUpperCase());
+        return aiService.chat(aiProvider, promptRequest);
     }
 
     @PostMapping("/chat/compare")
-    public String compareView(@RequestParam String prompt, Model model) {
-
-        String groqAnswer = groqService.chat(prompt)
-                .getChoices()
-                .getFirst()
-                .getMessage()
-                .getContent();
-
-        String mistralAnswer = mistralService.chat(prompt)
-                .getChoices()
-                .getFirst()
-                .getMessage()
-                .getContent();
-
-        // TODO: J'dois surement retourner autre chose qu'un string pour avoir les réponses de toutes les IA
-        return mistralAnswer;
+    public List<CompairatorDTO.CompareResponseDTO> compare(@Valid @RequestBody CompairatorDTO.CompareRequestDTO promptRequest) {
+        return aiService.compare(promptRequest);
     }
 
 }

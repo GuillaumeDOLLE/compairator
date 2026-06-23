@@ -1,38 +1,19 @@
 package com.will.compairator.ai.dto;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
+import com.will.compairator.ai.enums.AiProvider;
 import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.With;
 
-import java.util.List;
+public record AiChatDTO() {
 
-
-public class AiChatDTO {
-
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
+    @With
     @Builder
-    public static class RequestDTO {
-
-        @NotNull @NotBlank
-        private String model;
-
-        @NotEmpty
-        private List<MessageDTO> messages;
-
+    public record PostInputDTO(String prompt, AiProvider providerName) {
     }
 
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
+    @With
     @Builder
-    public static class ResponseDTO {
-        private List<AiChoiceDTO> choices;
+    public record PostOutputDTO(String content, String model) {
     }
 
 }

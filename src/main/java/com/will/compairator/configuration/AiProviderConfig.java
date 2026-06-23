@@ -5,6 +5,7 @@ import lombok.Data;
 @Data
 public class AiProviderConfig {
 
+    // pour matcher les éléments dans application.properties
     private String baseUrl;
     private String apiKey;
     private String model;

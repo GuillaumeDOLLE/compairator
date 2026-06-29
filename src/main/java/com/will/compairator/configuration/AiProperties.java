@@ -21,4 +21,5 @@ public class AiProperties {
 
         return config;
     }
+
 }

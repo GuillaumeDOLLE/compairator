@@ -4,16 +4,16 @@ import com.will.compairator.ai.enums.AiProvider;
 import lombok.Builder;
 import lombok.With;
 
-public record AiChatDTO() {
+public class AiChatDTO {
 
     @With
     @Builder
-    public record PostInputDTO(String prompt, AiProvider providerName) {
+    public static record PostInput(String prompt, AiProvider providerName) {
     }
 
     @With
     @Builder
-    public record PostOutputDTO(String content, String model) {
+    public static record PostOutput(String content, String model) {
     }
 
 }

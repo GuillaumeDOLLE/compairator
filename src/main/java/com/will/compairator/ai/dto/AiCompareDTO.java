@@ -6,21 +6,21 @@ import lombok.With;
 
 import java.util.List;
 
-public record AiCompareDTO() {
+public class AiCompareDTO {
 
     @With
     @Builder
-    public record PostInputDTO(List<AiProvider> providers, String prompt) {
+    public static record PostInput(List<AiProvider> providers, String prompt) {
     }
 
     @With
     @Builder
-    public record PostOutputDTO(AiProvider provider, String completion, String model) {
+    public static record AiResponse(AiProvider provider, String completion, String model) {
     }
 
     @With
     @Builder
-    public record PostOutputListDTO(List<PostOutputDTO> outputList) {
+    public static record PostOutput(List<AiResponse> output) {
     }
 
 

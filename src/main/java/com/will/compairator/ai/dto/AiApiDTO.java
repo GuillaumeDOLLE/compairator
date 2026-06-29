@@ -5,28 +5,28 @@ import lombok.With;
 
 import java.util.List;
 
-public record AiApiDTO() {
+public class AiApiDTO{
 
     @With
     @Builder
     // The history of the conversation with the AI, provides context,
     // each time the user add a new prompt, the whole conversation is sent again
-    public record InputDTO(String model, List<MessageDTO> messages) {
+    public static record Input(String model, List<Message> messages) {
     }
 
     @With
     @Builder
-    public record OutputDTO(List<ChoiceDTO> choices) {
+    public static record Output(List<Choice> choices) {
     }
 
     @With
     @Builder
-    public record ChoiceDTO(Integer index, MessageDTO message) {
+    public static record Choice(Integer index, Message message) {
     }
 
     @With
     @Builder
-    public record MessageDTO(String role, String content) {
+    public static record Message(String role, String content) {
     }
 
 }

@@ -1,5 +1,7 @@
 package com.will.compairator.ai.services;
 
+import com.will.compairator.ai.GroqAi;
+import com.will.compairator.ai.MistralAi;
 import com.will.compairator.ai.dto.AiApiDTO;
 import com.will.compairator.ai.dto.AiChatDTO;
 import com.will.compairator.ai.dto.AiCompareDTO;
@@ -8,7 +10,6 @@ import com.will.compairator.ai.enums.AiRole;
 import com.will.compairator.configuration.AiProperties;
 import com.will.compairator.configuration.AiProviderConfig;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestClient;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,73 +17,88 @@ import java.util.List;
 @Service
 public class AiService {
 
-    private final RestClient.Builder restClientBuilder;
     private final AiProperties aiProperties;
+    private final MistralAi mistralAi;
+    private final GroqAi groqAi;
 
-    public AiService(RestClient.Builder restClientBuilder, AiProperties aiProperties) {
-        this.restClientBuilder = restClientBuilder;
+    public AiService(
+            AiProperties aiProperties,
+            MistralAi mistralAi,
+            GroqAi groqAi) {
         this.aiProperties = aiProperties;
+        this.mistralAi = mistralAi;
+        this.groqAi = groqAi;
     }
 
-    public AiCompareDTO.PostOutputListDTO compare(AiCompareDTO.PostInputDTO compareInput) {
+    public AiCompareDTO.PostOutput compare(AiCompareDTO.PostInput compareInput) {
 
         if (compareInput.providers() == null ||
                 compareInput.providers().size() < 2) {
             throw new IllegalArgumentException("At least 2 providers are required");
         }
 
-        AiCompareDTO.PostOutputListDTO compareOutput = new AiCompareDTO.PostOutputListDTO(
-                new ArrayList<>()
-        );
+        List<AiCompareDTO.AiResponse> responses = new ArrayList<>();
 
         compareInput.providers().forEach(providerName -> {
             AiProviderConfig config = aiProperties.getProviderConfig(providerName);
 
-            AiChatDTO.PostInputDTO chatRequest =
-                    AiChatDTO.PostInputDTO.builder()
+            AiChatDTO.PostInput chatRequest =
+                    AiChatDTO.PostInput.builder()
                             .prompt(compareInput.prompt())
                             .providerName(providerName)
                             .build();
 
-                    AiChatDTO.PostOutputDTO chatResponse =
-                            chat(providerName, chatRequest);
+                    AiChatDTO.PostOutput chatResponse =
+                            chat(chatRequest);
 
-            compareOutput.outputList().add(
-                            new AiCompareDTO.PostOutputDTO(
-                                    providerName,
-                                    chatResponse.content(),
-                                    config.getModel()
-                            )
-                    );
+            responses.add(
+                    new AiCompareDTO.AiResponse(
+                            providerName,
+                            chatResponse.content(),
+                            config.getModel()
+                    )
+            );
         });
 
-        return new AiCompareDTO.PostOutputListDTO(compareOutput.outputList());
+        return new AiCompareDTO.PostOutput(List.copyOf(responses));
 
     }
 
-    public AiChatDTO.PostOutputDTO chat(AiProvider providerName, AiChatDTO.PostInputDTO chatInput) {
-        AiProviderConfig config = aiProperties.getProviderConfig(providerName);
+    public AiChatDTO.PostOutput chat(AiChatDTO.PostInput chatInput) {
 
-        AiApiDTO.InputDTO aiInput = buildRequest(chatInput, config);
+        AiProviderConfig config = aiProperties.getProviderConfig(chatInput.providerName());
 
-        AiApiDTO.OutputDTO aiOutput = sendRequest(aiInput, config);
+        AiApiDTO.Input aiInput = buildRequest(chatInput, config);
 
-        String content = aiOutput.choices()
-                .getFirst()
-                .message()
-                .content();
-        // version avec constructor
-        return new AiChatDTO.PostOutputDTO(content, config.getModel());
+        if (chatInput.providerName().equals(AiProvider.MISTRAL)) {
+            AiApiDTO.Output mistralOutput = mistralAi.sendRequest(aiInput, config);
+            String content = mistralOutput.choices()
+                    .getFirst()
+                    .message()
+                    .content();
+
+            return new AiChatDTO.PostOutput(content, config.getModel());
+
+        } else if (chatInput.providerName().equals(AiProvider.GROQ)) {
+            AiApiDTO.Output groqOutput = groqAi.sendRequest(aiInput, config);
+            String content = groqOutput.choices()
+                    .getFirst()
+                    .message()
+                    .content();
+
+            return new AiChatDTO.PostOutput(content, config.getModel());
+        } else {
+            throw new IllegalArgumentException("This provider name is incorrect");
+        }
+
     }
 
-
-
-    private AiApiDTO.InputDTO buildRequest(AiChatDTO.PostInputDTO chatRequest, AiProviderConfig config) {
+    private AiApiDTO.Input buildRequest(AiChatDTO.PostInput chatRequest, AiProviderConfig config) {
         if(chatRequest.prompt() == null || chatRequest.prompt().isBlank()) {
             throw new IllegalArgumentException("A prompt is required");
         }
 
-        AiApiDTO.MessageDTO prompt = AiApiDTO.MessageDTO.builder()
+        AiApiDTO.Message prompt = AiApiDTO.Message.builder()
                 // role is necessary to meet the expected format from the AI API
                 .role(AiRole.USER.name().toLowerCase())
                 .content(chatRequest.prompt())
@@ -90,26 +106,10 @@ public class AiService {
 
 
         // version sans constructor, avec le builder
-        return AiApiDTO.InputDTO.builder()
+        return AiApiDTO.Input.builder()
                 .model(config.getModel())
                 .messages(List.of(prompt))
                 .build();
     }
 
-    private RestClient buildRestClient(AiProviderConfig config) {
-        return restClientBuilder
-                .baseUrl(config.getBaseUrl())
-                .defaultHeader("Authorization", "Bearer " + config.getApiKey())
-                .build();
-    }
-
-    private AiApiDTO.OutputDTO sendRequest(AiApiDTO.InputDTO aiRequest, AiProviderConfig config) {
-        RestClient restClient = buildRestClient(config);
-
-        return restClient.post()
-                .uri(config.getEndpoint())
-                .body(aiRequest)
-                .retrieve()
-                .body(AiApiDTO.OutputDTO.class);
-    }
 }

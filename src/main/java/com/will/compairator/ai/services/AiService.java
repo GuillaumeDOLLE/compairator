@@ -39,7 +39,6 @@ public class AiService {
         List<AiCompareDTO.AiResponse> responses = new ArrayList<>();
 
         compareInput.providers().forEach(provider -> {
-            AiProviderConfig config = aiProperties.getProviderConfig(provider);
 
             AiChatDTO.PostInput chatRequest =
                     AiChatDTO.PostInput.builder()
@@ -54,7 +53,7 @@ public class AiService {
                     new AiCompareDTO.AiResponse(
                             provider,
                             chatResponse.content(),
-                            config.getModel()
+                            chatResponse.model()
                     )
             );
         });

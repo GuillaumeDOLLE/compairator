@@ -21,7 +21,7 @@ public class AiCompareRestController {
     }
 
     @PostMapping
-    public AiCompareDTO.PostOutput compareWithAi(@Valid @RequestBody AiCompareDTO.PostInput prompt) {
+    public AiCompareDTO.PostOutput compare(@Valid @RequestBody AiCompareDTO.PostInput prompt) {
         return aiService.compare(prompt);
     }
 

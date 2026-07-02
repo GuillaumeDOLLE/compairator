@@ -1,26 +1,40 @@
 package com.will.compairator.ai;
 
 import com.will.compairator.ai.dto.AiApiDTO;
-import com.will.compairator.configuration.AiClientConfig;
+import com.will.compairator.ai.enums.AiProvider;
+import com.will.compairator.configuration.AiProperties;
 import com.will.compairator.configuration.AiProviderConfig;
+import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
-public class GroqAi {
+@Component
+public class GroqAi extends ProviderAi {
 
-    private final AiClientConfig aiClientConfig;
+    private final AiProperties aiProperties;
+    private final RestClientFactory restClientFactory;
 
-    public GroqAi(AiClientConfig aiClientConfig) {
-        this.aiClientConfig = aiClientConfig;
+    public GroqAi(AiProperties aiProperties, RestClientFactory restClientFactory) {
+        super(aiProperties, restClientFactory);
+        this.aiProperties = aiProperties;
+        this.restClientFactory = restClientFactory;
     }
 
-    public AiApiDTO.Output sendRequest(AiApiDTO.Input aiRequest, AiProviderConfig config) {
-        RestClient restClient = aiClientConfig.buildRestClient(config);
+    @Override
+    public AiProvider getProvider() {
+        return AiProvider.GROQ;
+    }
+
+    @Override
+    public AiApiDTO.PostOutput sendRequest(AiApiDTO.PostInput aiRequest) {
+        AiProviderConfig providerConfig = aiProperties.getProviderConfig(this.getProvider());
+        RestClient restClient = restClientFactory.buildRestClient(providerConfig);
+        System.out.println("Send request de Groq");
 
         return restClient.post()
-                .uri(config.getEndpoint())
+                .uri(providerConfig.getEndpoint())
                 .body(aiRequest)
                 .retrieve()
-                .body(AiApiDTO.Output.class);
+                .body(AiApiDTO.PostOutput.class);
     }
 
 }

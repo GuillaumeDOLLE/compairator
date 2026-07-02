@@ -2,6 +2,8 @@ package com.will.compairator.ai.services;
 
 import com.will.compairator.ai.GroqAi;
 import com.will.compairator.ai.MistralAi;
+import com.will.compairator.ai.ProviderAi;
+import com.will.compairator.ai.ProviderFactory;
 import com.will.compairator.ai.dto.AiApiDTO;
 import com.will.compairator.ai.dto.AiChatDTO;
 import com.will.compairator.ai.dto.AiCompareDTO;
@@ -18,16 +20,13 @@ import java.util.List;
 public class AiService {
 
     private final AiProperties aiProperties;
-    private final MistralAi mistralAi;
-    private final GroqAi groqAi;
+    private final ProviderFactory providerFactory;
 
     public AiService(
             AiProperties aiProperties,
-            MistralAi mistralAi,
-            GroqAi groqAi) {
+            ProviderFactory providerFactory) {
         this.aiProperties = aiProperties;
-        this.mistralAi = mistralAi;
-        this.groqAi = groqAi;
+        this.providerFactory = providerFactory;
     }
 
     public AiCompareDTO.PostOutput compare(AiCompareDTO.PostInput compareInput) {
@@ -39,13 +38,13 @@ public class AiService {
 
         List<AiCompareDTO.AiResponse> responses = new ArrayList<>();
 
-        compareInput.providers().forEach(providerName -> {
-            AiProviderConfig config = aiProperties.getProviderConfig(providerName);
+        compareInput.providers().forEach(provider -> {
+            AiProviderConfig config = aiProperties.getProviderConfig(provider);
 
             AiChatDTO.PostInput chatRequest =
                     AiChatDTO.PostInput.builder()
                             .prompt(compareInput.prompt())
-                            .providerName(providerName)
+                            .provider(provider)
                             .build();
 
                     AiChatDTO.PostOutput chatResponse =
@@ -53,7 +52,7 @@ public class AiService {
 
             responses.add(
                     new AiCompareDTO.AiResponse(
-                            providerName,
+                            provider,
                             chatResponse.content(),
                             config.getModel()
                     )
@@ -66,34 +65,21 @@ public class AiService {
 
     public AiChatDTO.PostOutput chat(AiChatDTO.PostInput chatInput) {
 
-        AiProviderConfig config = aiProperties.getProviderConfig(chatInput.providerName());
+        AiProviderConfig providerConfig = aiProperties.getProviderConfig(chatInput.provider());
 
-        AiApiDTO.Input aiInput = buildRequest(chatInput, config);
+        AiApiDTO.PostInput aiInput = buildRequest(chatInput, providerConfig);
 
-        if (chatInput.providerName().equals(AiProvider.MISTRAL)) {
-            AiApiDTO.Output mistralOutput = mistralAi.sendRequest(aiInput, config);
-            String content = mistralOutput.choices()
+            ProviderAi providerAi = providerFactory.getProvider(chatInput.provider());
+            AiApiDTO.PostOutput aiOutput = providerAi.sendRequest(aiInput);
+            String content = aiOutput.choices()
                     .getFirst()
                     .message()
                     .content();
-
-            return new AiChatDTO.PostOutput(content, config.getModel());
-
-        } else if (chatInput.providerName().equals(AiProvider.GROQ)) {
-            AiApiDTO.Output groqOutput = groqAi.sendRequest(aiInput, config);
-            String content = groqOutput.choices()
-                    .getFirst()
-                    .message()
-                    .content();
-
-            return new AiChatDTO.PostOutput(content, config.getModel());
-        } else {
-            throw new IllegalArgumentException("This provider name is incorrect");
-        }
+            return new AiChatDTO.PostOutput(content, providerConfig.getModel());
 
     }
 
-    private AiApiDTO.Input buildRequest(AiChatDTO.PostInput chatRequest, AiProviderConfig config) {
+    private AiApiDTO.PostInput buildRequest(AiChatDTO.PostInput chatRequest, AiProviderConfig providerConfig) {
         if(chatRequest.prompt() == null || chatRequest.prompt().isBlank()) {
             throw new IllegalArgumentException("A prompt is required");
         }
@@ -106,8 +92,8 @@ public class AiService {
 
 
         // version sans constructor, avec le builder
-        return AiApiDTO.Input.builder()
-                .model(config.getModel())
+        return AiApiDTO.PostInput.builder()
+                .model(providerConfig.getModel())
                 .messages(List.of(prompt))
                 .build();
     }

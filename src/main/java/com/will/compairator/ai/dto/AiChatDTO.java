@@ -8,7 +8,7 @@ public class AiChatDTO {
 
     @With
     @Builder
-    public static record PostInput(String prompt, AiProvider providerName) {
+    public static record PostInput(String prompt, AiProvider provider) {
     }
 
     @With

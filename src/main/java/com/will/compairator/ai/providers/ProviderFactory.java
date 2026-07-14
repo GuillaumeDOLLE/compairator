@@ -10,7 +10,6 @@ public class ProviderFactory {
             return switch (aiProvider) {
                 case GROQ -> new GroqAi(providerConfig);
                 case MISTRAL -> new MistralAi(providerConfig);
-                default -> throw new IllegalStateException("Unknown provider");
             };
     }
 

@@ -1,32 +1,46 @@
 package com.will.compairator.ai.dto;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
-import lombok.With;
 
 import java.util.List;
 
 public class AiApiDTO {
 
-    @With
     @Builder
     // The history of the conversation with the AI, provides context,
     // each time the user add a new prompt, the whole conversation is sent again
-    public static record PostInput(String model, List<Message> messages) {
+    public static record PostInput(
+            @NotBlank
+            String model,
+
+            @NotNull
+            List<@NotNull Message> messages
+    ) {
     }
 
-    @With
     @Builder
-    public static record PostOutput(List<Choice> choices) {
+    public static record PostOutput(
+            List<Choice> choices
+    ) {
     }
 
-    @With
     @Builder
-    public static record Choice(Integer index, Message message) {
+    public static record Choice(
+            Integer index,
+            Message message
+    ) {
     }
 
-    @With
     @Builder
-    public static record Message(String role, String content) {
+    public static record Message(
+            @NotBlank
+            String role,
+
+            @NotBlank
+            String content
+    ) {
     }
 
 }

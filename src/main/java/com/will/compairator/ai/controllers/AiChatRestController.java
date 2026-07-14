@@ -1,7 +1,6 @@
 package com.will.compairator.ai.controllers;
 
 import com.will.compairator.ai.dto.AiChatDTO;
-import com.will.compairator.ai.exception.UnknownProviderException;
 import com.will.compairator.ai.services.AiService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +18,7 @@ public class AiChatRestController {
     }
 
     @PostMapping
-    public AiChatDTO.PostOutput chat(@Valid @RequestBody AiChatDTO.PostInput input) throws UnknownProviderException {
+    public AiChatDTO.PostOutput chat(@Valid @RequestBody AiChatDTO.PostInput input) {
         return aiService.chat(input);
     }
 

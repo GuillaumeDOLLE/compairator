@@ -1,6 +1,7 @@
 package com.will.compairator.configuration;
 
 import com.will.compairator.ai.enums.AiProvider;
+import com.will.compairator.ai.exception.InvalidProviderConfigurationException;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -13,7 +14,15 @@ public class AiProviderConfigResolver {
     }
 
     public AiProviderConfig resolve(AiProvider provider) {
-        return aiProperties.getProviderConfig(provider);
+
+        AiProviderConfig config = aiProperties.getProviderConfig(provider);
+
+        if (config == null) {
+            throw new InvalidProviderConfigurationException("Invalid configuration for provider " + provider);
+        }
+
+        return config;
+
     }
 
 }

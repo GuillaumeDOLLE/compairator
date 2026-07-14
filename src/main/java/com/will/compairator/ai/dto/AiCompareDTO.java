@@ -1,28 +1,45 @@
 package com.will.compairator.ai.dto;
 
 import com.will.compairator.ai.enums.AiProvider;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Builder;
-import lombok.With;
 
 import java.util.List;
 
 public class AiCompareDTO {
 
-    @With
     @Builder
-    public static record PostInput(List<AiProvider> providers, String prompt) {
+    public static record PostInput(
+            @NotNull
+            @Size(min = 2)
+            List<@NotNull AiProvider> providers,
+
+            @NotBlank
+            String prompt
+    ) {
     }
 
-    @With
     @Builder
-    public static record AiResponse(AiProvider provider, String completion, String model) {
+    public static record AiResponse(
+            @NotNull
+            AiProvider provider,
+
+            @NotBlank
+            String completion,
+
+            @NotBlank
+            String model
+    ) {
     }
 
-    @With
     @Builder
-    public static record PostOutput(List<AiResponse> output) {
+    public static record PostOutput(
+            @NotNull
+            List<@NotNull AiResponse> output
+    ) {
     }
-
 
 }
 

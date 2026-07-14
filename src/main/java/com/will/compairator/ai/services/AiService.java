@@ -1,5 +1,8 @@
 package com.will.compairator.ai.services;
 
+import com.will.compairator.ai.enums.AiProvider;
+import com.will.compairator.ai.exception.AiProviderInvalidResponseException;
+import com.will.compairator.ai.exception.InvalidComparisonException;
 import com.will.compairator.ai.providers.IProviderAi;
 import com.will.compairator.ai.providers.ProviderFactory;
 import com.will.compairator.ai.dto.AiApiDTO;
@@ -11,7 +14,9 @@ import com.will.compairator.configuration.AiProviderConfigResolver;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class AiService {
@@ -25,9 +30,15 @@ public class AiService {
 
     public AiCompareDTO.PostOutput compare(AiCompareDTO.PostInput compareInput) {
 
-        if (compareInput.providers() == null ||
-                compareInput.providers().size() < 2) {
-            throw new IllegalArgumentException("At least 2 providers are required");
+        Set<AiProvider> encounteredProviders = new HashSet<>();
+
+        // Check duplicates with the Set
+        for (AiProvider provider : compareInput.providers()) {
+            if (!encounteredProviders.add(provider)) {
+                throw new InvalidComparisonException(
+                        "Provider " + provider + " can't be selected more than once !"
+                );
+            }
         }
 
         List<AiCompareDTO.AiResponse> responses = new ArrayList<>();
@@ -62,19 +73,34 @@ public class AiService {
 
         AiApiDTO.PostInput aiInput = buildRequest(chatInput, providerConfig);
 
-            IProviderAi providerAi = ProviderFactory.getProvider(chatInput.provider(), providerConfig);
-            AiApiDTO.PostOutput aiOutput = providerAi.sendRequest(aiInput);
-            String content = aiOutput.choices()
-                    .getFirst()
-                    .message()
-                    .content();
-            return new AiChatDTO.PostOutput(content, providerConfig.getModel());
+        IProviderAi providerAi = ProviderFactory.getProvider(chatInput.provider(), providerConfig);
+
+        AiApiDTO.PostOutput aiOutput = providerAi.sendRequest(aiInput);
+
+        if (aiOutput == null
+                || aiOutput.choices() == null
+                || aiOutput.choices().isEmpty()) {
+            throw new AiProviderInvalidResponseException("Provider " + chatInput.provider() + " returned no usable choices");
+        }
+
+        AiApiDTO.Choice firstChoice = aiOutput.choices().getFirst();
+        if (firstChoice == null
+                || firstChoice.message() == null
+                || firstChoice.message().content().isBlank()) {
+            throw new AiProviderInvalidResponseException("Provider " + chatInput.provider() + " returned a choice without usable message content");
+        }
+
+        String content = aiOutput.choices()
+                .getFirst()
+                .message()
+                .content();
+        return new AiChatDTO.PostOutput(content, providerConfig.getModel());
 
     }
 
     private AiApiDTO.PostInput buildRequest(AiChatDTO.PostInput chatRequest, AiProviderConfig providerConfig) {
         if(chatRequest.prompt() == null || chatRequest.prompt().isBlank()) {
-            throw new IllegalArgumentException("A prompt is required");
+            throw new InvalidComparisonException("A prompt is required");
         }
 
         AiApiDTO.Message prompt = AiApiDTO.Message.builder()
@@ -83,8 +109,7 @@ public class AiService {
                 .content(chatRequest.prompt())
                 .build();
 
-
-        // version sans constructor, avec le builder
+        // builder version
         return AiApiDTO.PostInput.builder()
                 .model(providerConfig.getModel())
                 .messages(List.of(prompt))

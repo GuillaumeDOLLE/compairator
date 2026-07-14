@@ -1,19 +1,30 @@
 package com.will.compairator.ai.dto;
 
 import com.will.compairator.ai.enums.AiProvider;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
-import lombok.With;
 
 public class AiChatDTO {
 
-    @With
     @Builder
-    public static record PostInput(String prompt, AiProvider provider) {
+    public static record PostInput(
+            @NotBlank
+            String prompt,
+
+            @NotNull
+            AiProvider provider
+    ) {
     }
 
-    @With
     @Builder
-    public static record PostOutput(String content, String model) {
+    public static record PostOutput(
+            @NotBlank
+            String content,
+
+            @NotBlank
+            String model
+    ) {
     }
 
 }

@@ -1,15 +1,8 @@
 package com.will.compairator.ai.providers;
 
 import com.will.compairator.ai.enums.AiProvider;
-import com.will.compairator.configuration.AiProviderConfigResolver;
 
-public class ProviderFactory {
-
-    AiProviderConfigResolver aiProviderConfigResolver;
-
-    public ProviderFactory(AiProviderConfigResolver aiProviderConfigResolver) {
-        this.aiProviderConfigResolver = aiProviderConfigResolver;
-    }
+public final class ProviderFactory {
 
     public static IProviderAi getProvider(AiProvider aiProvider) {
 

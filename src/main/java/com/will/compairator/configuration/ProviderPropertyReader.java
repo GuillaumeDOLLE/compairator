@@ -11,7 +11,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Slf4j
-@Component
 public class ProviderPropertyReader {
 
     static final String AI_PROVIDER_PROPERTY_PREFIX = "ai.providers.";

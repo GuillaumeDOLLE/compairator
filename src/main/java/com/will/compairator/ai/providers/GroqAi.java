@@ -4,6 +4,7 @@ import com.will.compairator.ai.dto.AiApiDTO;
 import com.will.compairator.ai.enums.AiProvider;
 import com.will.compairator.ai.exception.AiProviderCallException;
 import com.will.compairator.configuration.AiProviderConfig;
+import com.will.compairator.configuration.AiProviderConfigResolver;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
 
@@ -11,8 +12,8 @@ public class GroqAi implements IProviderAi {
 
     private final AiProviderConfig aiProviderConfig;
 
-    public GroqAi(AiProviderConfig aiProviderConfig) {
-        this.aiProviderConfig = aiProviderConfig;
+    public GroqAi() {
+        this.aiProviderConfig = AiProviderConfigResolver.getInstance().resolve(AiProvider.GROQ);
     }
 
     @Override
@@ -21,16 +22,21 @@ public class GroqAi implements IProviderAi {
     }
 
     @Override
+    public String getModel() {
+        return aiProviderConfig.model();
+    }
+
+    @Override
     public AiApiDTO.PostOutput sendRequest(AiApiDTO.PostInput aiRequest) {
         RestClient restClient = RestClient.builder()
-                .baseUrl(aiProviderConfig.getBaseUrl())
-                .defaultHeader("Authorization", "Bearer " + aiProviderConfig.getApiKey())
+                .baseUrl(aiProviderConfig.baseUrl())
+                .defaultHeader("Authorization", "Bearer " + aiProviderConfig.apiKey())
                 .build();
         System.out.println("Send request de Groq");
 
         try {
             return restClient.post()
-                    .uri(aiProviderConfig.getEndpoint())
+                    .uri(aiProviderConfig.endpoint())
                     .body(aiRequest)
                     .retrieve()
                     .body(AiApiDTO.PostOutput.class);

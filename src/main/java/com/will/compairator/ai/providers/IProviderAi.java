@@ -5,7 +5,7 @@ import com.will.compairator.ai.enums.AiProvider;
 
 public interface IProviderAi {
 
-    public AiProvider getProvider();
-
-    public AiApiDTO.PostOutput sendRequest(AiApiDTO.PostInput aiRequest);
+    AiProvider getProvider();
+    String getModel();
+    AiApiDTO.PostOutput sendRequest(AiApiDTO.PostInput aiRequest);
 }

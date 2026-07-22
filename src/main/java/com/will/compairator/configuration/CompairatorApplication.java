@@ -2,15 +2,15 @@ package com.will.compairator.configuration;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 
 @SpringBootApplication(scanBasePackages = {
 		"com.will.compairator"
 })
-@ConfigurationPropertiesScan
 public class CompairatorApplication {
 
 	public static void main(String[] args) {
+		// fail fast if the resolver fails to read the property file and to validate all providers config
+		AiProviderConfigResolver.getInstance();
 		SpringApplication.run(CompairatorApplication.class, args);
 	}
 

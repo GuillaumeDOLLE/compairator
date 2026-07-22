@@ -1,21 +1,18 @@
 package com.will.compairator.configuration;
 
 import jakarta.validation.constraints.NotBlank;
-import lombok.Data;
-import org.springframework.stereotype.Component;
 
-@Data
-@Component
-public class AiProviderConfig {
+public record AiProviderConfig(
+        @NotBlank String apiKey,
+        @NotBlank String baseUrl,
+        @NotBlank String model,
+        @NotBlank String endpoint
+) {
 
-    // pour matcher les éléments dans application.properties
-    @NotBlank
-    private String baseUrl;
-    @NotBlank
-    private String apiKey;
-    @NotBlank
-    private String model;
-    @NotBlank
-    private String endpoint;
-
+    public AiProviderConfig(String apiKey, String baseUrl, String model, String endpoint) {
+        this.apiKey = apiKey;
+        this.baseUrl = baseUrl;
+        this.model = model;
+        this.endpoint = endpoint;
+    }
 }

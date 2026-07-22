@@ -15,15 +15,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ProblemDetail> handleHttpMessageNotReadable(HttpMessageNotReadableException ex) {
-        ProblemDetail pd = ProblemDetail.forStatusAndDetail(
-                HttpStatus.BAD_REQUEST,
-                "Request body is malformed or contains an unsupported value"
-        );
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(pd);
-    }
-
-    @ExceptionHandler(InvalidComparisonException.class)
-    public ResponseEntity<ProblemDetail> handleInvalidComparison(InvalidComparisonException ex) {
+        log.error("Request body is malformed or contains an unsupported value");
         ProblemDetail pd = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(pd);
     }
@@ -43,8 +35,22 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(InvalidProviderConfigurationException.class)
-    public ResponseEntity<ProblemDetail> handleProviderInvalidConfiguration(InvalidProviderConfigurationException ex) {
+    public ResponseEntity<ProblemDetail> handleInvalidProviderConfiguration(InvalidProviderConfigurationException ex) {
         log.error("The provider configuration is either invalid or missing", ex);
+        ProblemDetail pd = ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(pd);
+    }
+
+    @ExceptionHandler(InvalidPropertyFormatException.class)
+    public ResponseEntity<ProblemDetail> handleInvalidPropertyFormat(InvalidPropertyFormatException ex) {
+        log.error("The properties file has a format issue", ex);
+        ProblemDetail pd = ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(pd);
+    }
+
+    @ExceptionHandler(PropertyFileNotFoundException.class)
+    public ResponseEntity<ProblemDetail> handlePropertyFileNotFound(PropertyFileNotFoundException ex) {
+        log.error("The property file has not been found", ex);
         ProblemDetail pd = ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(pd);
     }

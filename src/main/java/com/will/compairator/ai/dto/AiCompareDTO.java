@@ -7,6 +7,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Builder;
 
 import java.util.List;
+import java.util.Set;
 
 public class AiCompareDTO {
 
@@ -14,7 +15,7 @@ public class AiCompareDTO {
     public static record PostInput(
             @NotNull
             @Size(min = 2)
-            List<@NotNull AiProvider> providers,
+            Set<@NotNull AiProvider> providers,
 
             @NotBlank
             String prompt

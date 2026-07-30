@@ -8,11 +8,4 @@ public record AiProviderConfig(
         @NotBlank String model,
         @NotBlank String endpoint
 ) {
-
-    public AiProviderConfig(String apiKey, String baseUrl, String model, String endpoint) {
-        this.apiKey = apiKey;
-        this.baseUrl = baseUrl;
-        this.model = model;
-        this.endpoint = endpoint;
-    }
 }

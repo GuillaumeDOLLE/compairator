@@ -9,7 +9,7 @@ public final class ProviderFactory {
             return switch (aiProvider) {
                 case GROQ -> new GroqAi();
                 case MISTRAL -> new MistralAi();
-                // no default because the error is being handled before the switch
+                default -> throw new IllegalStateException("Provider " + aiProvider + " is declared in AiProvider but is not handled by the factory");
             };
     }
 

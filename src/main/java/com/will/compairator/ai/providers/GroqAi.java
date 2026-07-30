@@ -10,33 +10,24 @@ import org.springframework.web.client.RestClientException;
 
 public class GroqAi implements IProviderAi {
 
-    private final AiProviderConfig aiProviderConfig;
-
-    public GroqAi() {
-        this.aiProviderConfig = AiProviderConfigResolver.getInstance().resolve(AiProvider.GROQ);
-    }
-
     @Override
     public AiProvider getProvider() {
         return AiProvider.GROQ;
     }
 
     @Override
-    public String getModel() {
-        return aiProviderConfig.model();
-    }
-
-    @Override
     public AiApiDTO.PostOutput sendRequest(AiApiDTO.PostInput aiRequest) {
+        AiProviderConfig groqConfig = getConfig();
+
         RestClient restClient = RestClient.builder()
-                .baseUrl(aiProviderConfig.baseUrl())
-                .defaultHeader("Authorization", "Bearer " + aiProviderConfig.apiKey())
+                .baseUrl(groqConfig.baseUrl())
+                .defaultHeader("Authorization", "Bearer " + groqConfig.apiKey())
                 .build();
         System.out.println("Send request de Groq");
 
         try {
             return restClient.post()
-                    .uri(aiProviderConfig.endpoint())
+                    .uri(groqConfig.endpoint())
                     .body(aiRequest)
                     .retrieve()
                     .body(AiApiDTO.PostOutput.class);

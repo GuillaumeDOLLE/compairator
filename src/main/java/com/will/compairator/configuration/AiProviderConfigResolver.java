@@ -2,6 +2,7 @@ package com.will.compairator.configuration;
 
 import com.will.compairator.ai.enums.AiProvider;
 import com.will.compairator.ai.exception.InvalidProviderConfigurationException;
+import io.micrometer.common.util.StringUtils;
 
 import java.util.EnumMap;
 import java.util.Map;
@@ -15,14 +16,14 @@ public final class AiProviderConfigResolver {
         return INSTANCE;
     }
 
-    private AiProviderConfigResolver() {
+    public AiProviderConfigResolver() {
         ProviderPropertyReader providerPropertyReader = new ProviderPropertyReader();
-        Map<String, String> providersProperties = providerPropertyReader.readProperties();
+        Map<String, String> providersProperties = providerPropertyReader.getApplicationAiProperties();
         Map<AiProvider, AiProviderConfig> tempMap = new EnumMap<>(AiProvider.class);
 
         // loop on enum
-        for (AiProvider providerName : AiProvider.values()) {
-            String providerNameToLowerCase = providerName.name().toLowerCase();
+        for (AiProvider provider : AiProvider.values()) {
+            String providerNameToLowerCase = provider.name().toLowerCase();
 
             // prefix ai.providers.(providerName).
             String keyPrefix = ProviderPropertyReader.AI_PROVIDER_PROPERTY_PREFIX + providerNameToLowerCase + ".";
@@ -32,21 +33,24 @@ public final class AiProviderConfigResolver {
             String model = providersProperties.get(keyPrefix + "model");
             String endpoint = providersProperties.get(keyPrefix + "endpoint");
 
+
+
+            if (StringUtils.isBlank(apiKey)) {
+                throw new InvalidProviderConfigurationException("Invalid configuration for provider " + provider + ": missing api key");
+            }
+            if (StringUtils.isBlank(baseUrl)) {
+                throw new InvalidProviderConfigurationException("Invalid configuration for provider " + provider + ": missing base url");
+            }
+            if (StringUtils.isBlank(model)) {
+                throw new InvalidProviderConfigurationException("Invalid configuration for provider " + provider + ": missing model");
+            }
+            if (StringUtils.isBlank(endpoint)) {
+                throw new InvalidProviderConfigurationException("Invalid configuration for provider " + provider + ": missing endpoint");
+            }
+
             AiProviderConfig config = new AiProviderConfig(apiKey, baseUrl, model, endpoint);
 
-            if (config.apiKey() == null || config.apiKey().isBlank()) {
-                throw new InvalidProviderConfigurationException("Invalid configuration for provider " + providerName + ": missing api key");
-            }
-            if (config.baseUrl() == null || config.baseUrl().isBlank()) {
-                throw new InvalidProviderConfigurationException("Invalid configuration for provider " + providerName + ": missing base url");
-            }
-            if (config.model() == null || config.model().isBlank()) {
-                throw new InvalidProviderConfigurationException("Invalid configuration for provider " + providerName + ": missing model");
-            }
-            if (config.endpoint() == null || config.endpoint().isBlank()) {
-                throw new InvalidProviderConfigurationException("Invalid configuration for provider " + providerName + ": missing endpoint");
-            }
-            tempMap.put(providerName, config);
+            tempMap.put(provider, config);
         }
         // Immutable copy of tempMap
         this.providers = Map.copyOf(tempMap);

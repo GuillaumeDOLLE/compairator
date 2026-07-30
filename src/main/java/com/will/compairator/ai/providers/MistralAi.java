@@ -10,33 +10,25 @@ import org.springframework.web.client.RestClientException;
 
 public class MistralAi implements IProviderAi {
 
-    private final AiProviderConfig aiProviderConfig;
-
-    public MistralAi() {
-        this.aiProviderConfig = AiProviderConfigResolver.getInstance().resolve(AiProvider.MISTRAL);
-    }
-
     @Override
     public AiProvider getProvider() {
         return AiProvider.MISTRAL;
     }
 
-    @Override
-    public String getModel() {
-        return aiProviderConfig.model();
-    }
 
     @Override
     public AiApiDTO.PostOutput sendRequest(AiApiDTO.PostInput aiRequest) {
+        AiProviderConfig mistralConfig = getConfig();
+
         RestClient restClient = RestClient.builder()
-                .baseUrl(aiProviderConfig.baseUrl())
-                .defaultHeader("Authorization", "Bearer " + aiProviderConfig.apiKey())
+                .baseUrl(mistralConfig.baseUrl())
+                .defaultHeader("Authorization", "Bearer " + mistralConfig.apiKey())
                 .build();
         System.out.println("Send request de Mistral");
 
         try {
             return restClient.post()
-                    .uri(aiProviderConfig.endpoint())
+                    .uri(mistralConfig.endpoint())
                     .body(aiRequest)
                     .retrieve()
                     .body(AiApiDTO.PostOutput.class);

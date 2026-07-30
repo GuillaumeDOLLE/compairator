@@ -48,8 +48,8 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(pd);
     }
 
-    @ExceptionHandler(PropertyFileNotFoundException.class)
-    public ResponseEntity<ProblemDetail> handlePropertyFileNotFound(PropertyFileNotFoundException ex) {
+    @ExceptionHandler(MandatoryApplicationPropertyFileNotFoundException.class)
+    public ResponseEntity<ProblemDetail> handleMandatoryApplicationPropertyFileNotFound(MandatoryApplicationPropertyFileNotFoundException ex) {
         log.error("The property file has not been found", ex);
         ProblemDetail pd = ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(pd);

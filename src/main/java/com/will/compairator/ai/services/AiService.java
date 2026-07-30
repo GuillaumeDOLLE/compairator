@@ -47,9 +47,7 @@ public class AiService {
 
         IProviderAi providerAi = ProviderFactory.getProvider(chatInput.provider());
 
-        String providerModel = providerAi.getModel();
-
-        AiApiDTO.PostInput aiInput = buildRequest(chatInput, providerModel);
+        AiApiDTO.PostInput aiInput = buildRequest(chatInput, providerAi.getConfig().model());
 
         AiApiDTO.PostOutput aiOutput = providerAi.sendRequest(aiInput);
 
@@ -65,11 +63,10 @@ public class AiService {
             throw new AiProviderInvalidResponseException("Provider " + chatInput.provider() + " returned a choice without usable message content");
         }
 
-        String content = aiOutput.choices()
+        return new AiChatDTO.PostOutput(aiOutput.choices()
                 .getFirst()
                 .message()
-                .content();
-        return new AiChatDTO.PostOutput(content, providerModel);
+                .content(), providerAi.getConfig().model());
     }
 
     private AiApiDTO.PostInput buildRequest(AiChatDTO.PostInput chatRequest, String providerModel) {

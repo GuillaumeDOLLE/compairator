@@ -55,12 +55,10 @@ public class AiService {
 
         IProviderAi providerAi = ProviderFactory.getProvider(chatInput.provider());
 
-        AiApiDTO.PostInput aiInput = buildRequest(chatInput, providerAi.getConfig().model());
-
         long startTime = System.nanoTime();
 
         try {
-            AiApiDTO.PostOutput aiOutput = providerAi.sendRequest(aiInput);
+            AiApiDTO.PostOutput aiOutput = providerAi.sendRequest(chatInput);
 
             if (aiOutput == null || CollectionUtils.isEmpty(aiOutput.choices())) {
                 throw new AiProviderInvalidResponseException("Provider " + chatInput.provider() + " returned no usable choices");
@@ -108,24 +106,6 @@ public class AiService {
             throw exception;
         }
 
-
-
-
-    }
-
-    private AiApiDTO.PostInput buildRequest(AiChatDTO.PostInput chatRequest, String providerModel) {
-
-        AiApiDTO.Message prompt = AiApiDTO.Message.builder()
-                // role is necessary to meet the expected format from the AI API
-                .role(AiRole.USER.name().toLowerCase())
-                .content(chatRequest.prompt())
-                .build();
-
-        // builder version
-        return AiApiDTO.PostInput.builder()
-                .model(providerModel)
-                .messages(List.of(prompt))
-                .build();
     }
 
 }

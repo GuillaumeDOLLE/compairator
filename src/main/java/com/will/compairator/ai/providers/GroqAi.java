@@ -1,12 +1,16 @@
 package com.will.compairator.ai.providers;
 
 import com.will.compairator.ai.dto.AiApiDTO;
+import com.will.compairator.ai.dto.AiChatDTO;
 import com.will.compairator.ai.enums.AiProvider;
+import com.will.compairator.ai.enums.AiRole;
 import com.will.compairator.ai.exception.AiProviderCallException;
 import com.will.compairator.configuration.AiProviderConfig;
 import com.will.compairator.configuration.AiProviderConfigResolver;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
+
+import java.util.List;
 
 public class GroqAi implements IProviderAi {
 
@@ -16,8 +20,18 @@ public class GroqAi implements IProviderAi {
     }
 
     @Override
-    public AiApiDTO.PostOutput sendRequest(AiApiDTO.PostInput aiRequest) {
+    public AiApiDTO.PostOutput sendRequest(AiChatDTO.PostInput chatInput) {
         AiProviderConfig groqConfig = getConfig();
+
+        AiApiDTO.Message prompt = AiApiDTO.Message.builder()
+                .role(AiRole.USER.name().toLowerCase())
+                .content(chatInput.prompt())
+                .build();
+
+        AiApiDTO.PostInput aiRequest = AiApiDTO.PostInput.builder()
+                .model(groqConfig.model())
+                .messages(List.of(prompt))
+                .build();
 
         RestClient restClient = RestClient.builder()
                 .baseUrl(groqConfig.baseUrl())

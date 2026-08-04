@@ -1,6 +1,7 @@
 package com.will.compairator.ai.services;
 
 import com.will.compairator.ai.enums.AiApiRequestStatus;
+import com.will.compairator.ai.enums.AiApiResponseOrigin;
 import com.will.compairator.ai.enums.AiProvider;
 import com.will.compairator.ai.model.exception.AiApiRequestLogCreationException;
 import io.micrometer.common.util.StringUtils;
@@ -15,7 +16,8 @@ public record AiApiRequestObject(
         AiApiRequestStatus status,
         String errorMessage,
         Instant createdAt,
-        long durationMs
+        long durationMs,
+        AiApiResponseOrigin origin
 ) {
     // compact constructor syntax for records
     public AiApiRequestObject {

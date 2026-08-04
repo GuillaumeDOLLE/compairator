@@ -3,6 +3,7 @@ package com.will.compairator.configuration;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.persistence.autoconfigure.EntityScan;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @EntityScan("com.will.compairator.ai.model")
@@ -10,6 +11,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 		"com.will.compairator"
 })
 @EnableJpaRepositories(basePackages = "com.will.compairator.ai.persistence")
+@EnableCaching
 public class CompairatorApplication {
 
 	public static void main(String[] args) {

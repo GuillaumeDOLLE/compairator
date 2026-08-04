@@ -1,12 +1,15 @@
 package com.will.compairator.ai.services;
 
 import com.will.compairator.ai.enums.AiApiRequestStatus;
+import com.will.compairator.ai.enums.AiApiResponseOrigin;
 import com.will.compairator.ai.exception.AiProviderInvalidResponseException;
 import com.will.compairator.ai.providers.IProviderAi;
 import com.will.compairator.ai.providers.ProviderFactory;
 import com.will.compairator.ai.dto.AiApiDTO;
 import com.will.compairator.ai.dto.AiChatDTO;
 import com.will.compairator.ai.dto.AiCompareDTO;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -18,9 +21,13 @@ import java.util.List;
 public class AiService {
 
     private final AiApiRequestLogService aiApiRequestLogService;
+    private final AiApiRequestCachedService aiApiRequestCachedService;
+    private final CacheManager cacheManager;
 
-    public AiService(AiApiRequestLogService aiApiRequestLogService) {
+    public AiService(AiApiRequestLogService aiApiRequestLogService, AiApiRequestCachedService aiApiRequestCachedService, CacheManager cacheManager) {
         this.aiApiRequestLogService = aiApiRequestLogService;
+        this.aiApiRequestCachedService = aiApiRequestCachedService;
+        this.cacheManager = cacheManager;
     }
 
 
@@ -58,10 +65,17 @@ public class AiService {
         long startTime = System.nanoTime();
 
         try {
-            AiApiDTO.PostOutput aiOutput = providerAi.sendRequest(chatInput);
+            Cache potentialCache = cacheManager.getCache("aiResponse");
+
+            boolean isResponseCached = potentialCache != null && potentialCache.get(chatInput) != null;
+
+            // cache method
+            AiApiDTO.PostOutput aiOutput = aiApiRequestCachedService.sendRequest(providerAi, chatInput);
 
             // duration of the response after the request was sent
             long durationMs = (System.nanoTime() - startTime) / 1_000_000;
+
+            AiApiResponseOrigin aiApiResponseOrigin = isResponseCached ? AiApiResponseOrigin.CACHE : AiApiResponseOrigin.PROVIDER;
 
             String errorMessage = null;
 
@@ -87,7 +101,8 @@ public class AiService {
                     AiApiRequestStatus.SUCCESS,
                     errorMessage,
                     Instant.now(),
-                    durationMs
+                    durationMs,
+                    aiApiResponseOrigin
             );
 
             aiApiRequestLogService.createAiApiRequestLog(aiApiRequestObject);
@@ -107,7 +122,8 @@ public class AiService {
                     AiApiRequestStatus.ERROR,
                     exception.getMessage(),
                     Instant.now(),
-                    durationMs
+                    durationMs,
+                    AiApiResponseOrigin.PROVIDER
             );
 
             aiApiRequestLogService.createAiApiRequestLog(aiApiRequestObject);

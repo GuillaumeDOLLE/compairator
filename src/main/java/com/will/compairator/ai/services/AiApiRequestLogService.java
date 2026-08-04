@@ -24,6 +24,7 @@ public class AiApiRequestLogService {
                 .errorMessage(aiApiRequestObject.errorMessage())
                 .createdAt(aiApiRequestObject.createdAt())
                 .durationMs(aiApiRequestObject.durationMs())
+                .origin(aiApiRequestObject.origin())
                 .build();
 
         return aiApiRequestLogRepository.save(aiApiRequestLogEntity);

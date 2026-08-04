@@ -1,6 +1,7 @@
 package com.will.compairator.ai.model;
 
 import com.will.compairator.ai.enums.AiApiRequestStatus;
+import com.will.compairator.ai.enums.AiApiResponseOrigin;
 import com.will.compairator.ai.enums.AiProvider;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -45,5 +46,9 @@ public class AiApiRequestLogEntity {
 
     @Column(nullable = false)
     long durationMs;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    AiApiResponseOrigin origin;
 
 }

@@ -6,7 +6,6 @@ import com.will.compairator.ai.enums.AiProvider;
 import com.will.compairator.ai.enums.AiRole;
 import com.will.compairator.ai.exception.AiProviderCallException;
 import com.will.compairator.configuration.AiProviderConfig;
-import com.will.compairator.configuration.AiProviderConfigResolver;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
 

@@ -1,6 +1,6 @@
 package com.will.compairator.ai.model;
 
-import com.will.compairator.ai.enums.AiCallStatus;
+import com.will.compairator.ai.enums.AiApiRequestStatus;
 import com.will.compairator.ai.enums.AiProvider;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -14,9 +14,9 @@ import java.time.Instant;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Table(name = "ai_call_trace")
+@Table(name = "ai_api_request_log")
 @Entity
-public class AiCallTraceEntity {
+public class AiApiRequestLogEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,7 +35,7 @@ public class AiCallTraceEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    AiCallStatus status;
+    AiApiRequestStatus status;
 
     @Lob
     String errorMessage;

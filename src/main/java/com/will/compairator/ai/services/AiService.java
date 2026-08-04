@@ -1,13 +1,12 @@
 package com.will.compairator.ai.services;
 
-import com.will.compairator.ai.enums.AiCallStatus;
+import com.will.compairator.ai.enums.AiApiRequestStatus;
 import com.will.compairator.ai.exception.AiProviderInvalidResponseException;
 import com.will.compairator.ai.providers.IProviderAi;
 import com.will.compairator.ai.providers.ProviderFactory;
 import com.will.compairator.ai.dto.AiApiDTO;
 import com.will.compairator.ai.dto.AiChatDTO;
 import com.will.compairator.ai.dto.AiCompareDTO;
-import com.will.compairator.ai.enums.AiRole;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -18,11 +17,12 @@ import java.util.List;
 @Service
 public class AiService {
 
-    private AiCallTraceService aiCallTraceService;
+    private final AiApiRequestLogService aiApiRequestLogService;
 
-    public AiService(AiCallTraceService aiCallTraceService) {
-        this.aiCallTraceService = aiCallTraceService;
+    public AiService(AiApiRequestLogService aiApiRequestLogService) {
+        this.aiApiRequestLogService = aiApiRequestLogService;
     }
+
 
     public AiCompareDTO.PostOutput compare(AiCompareDTO.PostInput compareInput) {
 
@@ -60,8 +60,14 @@ public class AiService {
         try {
             AiApiDTO.PostOutput aiOutput = providerAi.sendRequest(chatInput);
 
+            // duration of the response after the request was sent
+            long durationMs = (System.nanoTime() - startTime) / 1_000_000;
+
+            String errorMessage = null;
+
             if (aiOutput == null || CollectionUtils.isEmpty(aiOutput.choices())) {
-                throw new AiProviderInvalidResponseException("Provider " + chatInput.provider() + " returned no usable choices");
+                errorMessage = "Provider " + chatInput.provider() + " returned no usable choices";
+                throw new AiProviderInvalidResponseException(errorMessage);
             }
 
             // Sometimes the AI respond with 2 choices, here we choose the first one
@@ -69,22 +75,22 @@ public class AiService {
             if (firstChoice == null
                     || firstChoice.message() == null
                     || firstChoice.message().content().isBlank()) {
-                throw new AiProviderInvalidResponseException("Provider " + chatInput.provider() + " returned a choice without usable message content");
+                errorMessage = "Provider " + chatInput.provider() + " returned a choice without usable message content";
+                throw new AiProviderInvalidResponseException(errorMessage);
             }
 
-            // duration of the response after the request was sent
-            long durationMs = (System.nanoTime() - startTime) / 1_000_000;
-
-            aiCallTraceService.createAiCallTrace(
+            AiApiRequestObject aiApiRequestObject = new AiApiRequestObject(
                     chatInput.provider(),
                     providerAi.getConfig().model(),
                     chatInput.prompt(),
                     firstChoice.message().content(),
-                    AiCallStatus.SUCCESS,
-                    null,
+                    AiApiRequestStatus.SUCCESS,
+                    errorMessage,
                     Instant.now(),
                     durationMs
             );
+
+            aiApiRequestLogService.createAiApiRequestLog(aiApiRequestObject);
 
             return new AiChatDTO.PostOutput(aiOutput.choices()
                     .getFirst()
@@ -92,16 +98,19 @@ public class AiService {
                     .content(), providerAi.getConfig().model());
         } catch (RuntimeException exception) {
             long durationMs = (System.nanoTime() - startTime) / 1_000_000;
-            aiCallTraceService.createAiCallTrace(
+
+            AiApiRequestObject aiApiRequestObject = new AiApiRequestObject(
                     chatInput.provider(),
                     providerAi.getConfig().model(),
                     chatInput.prompt(),
                     null,
-                    AiCallStatus.ERROR,
+                    AiApiRequestStatus.ERROR,
                     exception.getMessage(),
                     Instant.now(),
                     durationMs
             );
+
+            aiApiRequestLogService.createAiApiRequestLog(aiApiRequestObject);
 
             throw exception;
         }

@@ -66,16 +66,25 @@ public class AiService {
 
         try {
             Cache potentialCache = cacheManager.getCache("aiResponse");
+            AiApiDTO.PostOutput aiOutput = null;
+            long durationMs = 0;
+            AiApiResponseOrigin aiApiResponseOrigin = null;
 
-            boolean isResponseCached = potentialCache != null && potentialCache.get(chatInput) != null;
+            if (potentialCache != null && potentialCache.get(chatInput) != null) {
 
-            // cache method
-            AiApiDTO.PostOutput aiOutput = aiApiRequestCachedService.sendRequest(providerAi, chatInput);
+                // cache method
+                aiOutput = aiApiRequestCachedService.sendRequest(providerAi, chatInput);
+                // duration of the response after the request was sent
+                durationMs = (System.nanoTime() - startTime) / 1_000_000;
+                aiApiResponseOrigin = AiApiResponseOrigin.CACHE;
 
-            // duration of the response after the request was sent
-            long durationMs = (System.nanoTime() - startTime) / 1_000_000;
+            } else {
+                aiOutput = aiApiRequestCachedService.sendRequest(providerAi, chatInput);
 
-            AiApiResponseOrigin aiApiResponseOrigin = isResponseCached ? AiApiResponseOrigin.CACHE : AiApiResponseOrigin.PROVIDER;
+                durationMs = (System.nanoTime() - startTime) / 1_000_000;
+                aiApiResponseOrigin = AiApiResponseOrigin.PROVIDER;
+
+            }
 
             String errorMessage = null;
 

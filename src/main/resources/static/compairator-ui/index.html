@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Compairator — Comparer les IA</title>
+  <link rel="stylesheet" href="/compairator-ui/styles.css">
+  <script src="/compairator-ui/app.js" defer></script>
+</head>
+<body>
+  <header><a href="/" class="brand">comp<span>ai</span>rator<span class="dot">.</span></a><span>Votre regard sur les IA</span></header>
+  <main>
+    <section class="intro"><p class="eyebrow">UNE QUESTION, PLUSIEURS PERSPECTIVES</p><h1>Comparez les idées.<br>Faites votre choix.</h1><p>Posez la même question à plusieurs intelligences artificielles et explorez leurs réponses côte à côte.</p></section>
+    <form id="compare-form">
+      <fieldset id="controls">
+        <label for="prompt" class="label">Que souhaitez-vous demander ?</label>
+        <textarea id="prompt" name="prompt" rows="5" required placeholder="Par exemple : explique-moi les avantages et les limites de la voiture électrique."></textarea>
+        <button type="button" id="example" class="example">Essayer une question d’exemple ↗</button>
+        <fieldset class="providers"><legend>Choisissez vos IA</legend>
+          <label><input type="checkbox" name="provider" value="GROQ" checked><span><strong>Groq</strong><small>Un premier point de vue</small></span></label>
+          <label><input type="checkbox" name="provider" value="MISTRAL" checked><span><strong>Mistral</strong><small>Une autre perspective</small></span></label>
+        </fieldset>
+        <div class="actions"><p>Deux IA pour comparer, une seule pour une réponse simple.</p><button type="submit" id="submit">Comparer les réponses →</button></div>
+      </fieldset>
+    </form>
+    <p id="status" role="status" aria-live="polite">Prêt à explorer vos idées.</p>
+    <p id="error" role="alert" hidden></p>
+    <section id="results-section" aria-labelledby="results-title" hidden><h2 id="results-title">Les réponses à votre question</h2><p id="question"></p><div id="results"></div></section>
+    <footer>Les réponses sont générées par des IA et peuvent contenir des erreurs. Prenez le temps de les vérifier.</footer>
+  </main>
+</body>
+</html>

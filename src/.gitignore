@@ -1,0 +1,3 @@
+# Local verification logs; never include them in a commit.
+/live-demo-run.log
+/mysql-test-run.log

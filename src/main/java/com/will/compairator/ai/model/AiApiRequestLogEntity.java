@@ -10,6 +10,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.Instant;
+import java.math.BigDecimal;
+import com.will.compairator.user.model.UserEntity;
+import com.will.compairator.comparison.model.ComparisonEntity;
 
 @Getter
 @AllArgsConstructor
@@ -50,5 +53,17 @@ public class AiApiRequestLogEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     AiApiResponseOrigin origin;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    UserEntity user;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    ComparisonEntity comparison;
+
+    Long promptTokens;
+    Long completionTokens;
+
+    @Column(precision = 24, scale = 12)
+    BigDecimal estimatedCostUsd;
 
 }

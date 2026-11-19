@@ -11,11 +11,34 @@
   <header><a href="/" class="brand">comp<span>ai</span>rator<span class="dot">.</span></a><span>Votre regard sur les IA</span></header>
   <main>
     <section class="intro"><p class="eyebrow">UNE QUESTION, PLUSIEURS PERSPECTIVES</p><h1>Comparez les idées.<br>Faites votre choix.</h1><p>Posez la même question à plusieurs intelligences artificielles et explorez leurs réponses côte à côte.</p></section>
+    <section id="account" aria-labelledby="account-title">
+      <h2 id="account-title">Votre compte</h2>
+      <p id="account-status" role="status" aria-live="polite">Vérification de la connexion…</p>
+      <form id="account-form">
+        <label class="label" for="email">Adresse e-mail</label>
+        <input id="email" type="email" maxlength="254" autocomplete="username" required>
+        <label class="label" for="password">Mot de passe</label>
+        <input id="password" type="password" maxlength="128" autocomplete="current-password" required>
+        <p>Pour créer un compte : entre 12 et 128 caractères.</p>
+        <div class="actions">
+          <button type="submit">Se connecter</button>
+          <button type="button" id="register">Créer un compte</button>
+        </div>
+      </form>
+      <button type="button" id="logout" hidden>Se déconnecter</button>
+      <p id="account-error" role="alert" hidden></p>
+    </section>
     <form id="compare-form">
-      <fieldset id="controls">
+      <fieldset id="controls" disabled>
         <label for="prompt" class="label">Que souhaitez-vous demander ?</label>
         <textarea id="prompt" name="prompt" rows="5" required placeholder="Par exemple : explique-moi les avantages et les limites de la voiture électrique."></textarea>
         <button type="button" id="example" class="example">Essayer une question d’exemple ↗</button>
+        <label class="label" for="task-type">Type de tâche</label>
+        <select id="task-type">
+          <option value="GENERAL">Général</option><option value="WRITING">Rédaction</option>
+          <option value="CODING">Code</option><option value="SUMMARY">Résumé</option>
+          <option value="ANALYSIS">Analyse</option><option value="OTHER">Autre</option>
+        </select>
         <fieldset class="providers"><legend>Choisissez vos IA</legend>
           <label><input type="checkbox" name="provider" value="GROQ" checked><span><strong>Groq</strong><small>Un premier point de vue</small></span></label>
           <label><input type="checkbox" name="provider" value="MISTRAL" checked><span><strong>Mistral</strong><small>Une autre perspective</small></span></label>
@@ -25,7 +48,20 @@
     </form>
     <p id="status" role="status" aria-live="polite">Prêt à explorer vos idées.</p>
     <p id="error" role="alert" hidden></p>
-    <section id="results-section" aria-labelledby="results-title" hidden><h2 id="results-title">Les réponses à votre question</h2><p id="question"></p><div id="results"></div></section>
+    <section id="results-section" aria-labelledby="results-title" hidden>
+      <h2 id="results-title">Les réponses à votre question</h2><p id="question"></p><div id="results"></div>
+      <section id="feedback" aria-labelledby="feedback-title" hidden>
+        <h3 id="feedback-title">Quelle réponse préférez-vous ?</h3>
+        <p>Votre avis est facultatif. Chaque choix est enregistré automatiquement et peut être modifié : le nouveau choix remplace le précédent.</p>
+        <div id="preference-options" class="feedback-options"></div>
+        <div id="usefulness" hidden>
+          <p>Cette comparaison vous a-t-elle été utile ?</p>
+          <button type="button" data-useful="true">Oui</button>
+          <button type="button" data-useful="false">Non</button>
+        </div>
+        <p id="feedback-status" role="status" aria-live="polite"></p>
+      </section>
+    </section>
     <footer>Les réponses sont générées par des IA et peuvent contenir des erreurs. Prenez le temps de les vérifier.</footer>
   </main>
 </body>

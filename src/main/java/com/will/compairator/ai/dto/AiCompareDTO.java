@@ -8,6 +8,8 @@ import lombok.Builder;
 
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
+import com.will.compairator.comparison.enums.TaskType;
 
 public class AiCompareDTO {
 
@@ -18,7 +20,8 @@ public class AiCompareDTO {
             Set<@NotNull AiProvider> providers,
 
             @NotBlank
-            String prompt
+            String prompt,
+            TaskType taskType
     ) {
     }
 
@@ -38,7 +41,8 @@ public class AiCompareDTO {
     @Builder
     public static record PostOutput(
             @NotNull
-            List<@NotNull AiResponse> output
+            List<@NotNull AiResponse> output,
+            UUID comparisonId
     ) {
     }
 

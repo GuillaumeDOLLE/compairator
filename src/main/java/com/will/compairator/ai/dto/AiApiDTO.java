@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 
 import java.util.List;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class AiApiDTO {
 
@@ -22,9 +23,14 @@ public class AiApiDTO {
 
     @Builder
     public static record PostOutput(
-            List<Choice> choices
+            List<Choice> choices,
+            String model,
+            Usage usage
     ) {
     }
+
+    public record Usage(@JsonProperty("prompt_tokens") Long promptTokens,
+                        @JsonProperty("completion_tokens") Long completionTokens) {}
 
     @Builder
     public static record Choice(

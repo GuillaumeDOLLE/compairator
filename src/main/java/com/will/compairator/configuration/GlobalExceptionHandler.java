@@ -8,15 +8,30 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    @ExceptionHandler(ObjectOptimisticLockingFailureException.class)
+    public ResponseEntity<ProblemDetail> handleConcurrentUpdate(ObjectOptimisticLockingFailureException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(ProblemDetail.forStatusAndDetail(
+                HttpStatus.CONFLICT, "L’évaluation a été modifiée simultanément. Réessayez."));
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ProblemDetail> handleValidation(MethodArgumentNotValidException ex) {
+        // Do not log or echo rejected values: registration includes a password.
+        ProblemDetail pd = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, "Les champs de la demande sont invalides.");
+        return ResponseEntity.badRequest().body(pd);
+    }
+
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ProblemDetail> handleHttpMessageNotReadable(HttpMessageNotReadableException ex) {
         log.error("Request body is malformed or contains an unsupported value");
-        ProblemDetail pd = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ex.getMessage());
+        ProblemDetail pd = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, "Le JSON est invalide ou contient une valeur non prise en charge.");
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(pd);
     }
 

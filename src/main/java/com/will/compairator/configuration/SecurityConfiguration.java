@@ -20,6 +20,7 @@ public class SecurityConfiguration {
         return http
                 .authorizeHttpRequests(auth -> auth
                         .dispatcherTypeMatchers(DispatcherType.FORWARD, DispatcherType.ERROR).permitAll()
+                        .requestMatchers("/admin/**", "/compairator-ui/admin.html").hasRole("ADMIN")
                         .requestMatchers("/", "/web", "/web/", "/compairator-ui/**", "/auth/csrf", "/auth/register").permitAll()
                         .requestMatchers("/stats/**").hasRole("ADMIN")
                         .anyRequest().authenticated())

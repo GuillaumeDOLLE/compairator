@@ -118,6 +118,7 @@ async function apiFetch(url, options = {}) {
 
 function setSession(user) {
   currentUser = user;
+  document.querySelector('#admin-stats-link').hidden = user?.role !== 'ADMIN';
   controls.disabled = !user;
   document.querySelector('#account-form').hidden = !!user;
   document.querySelector('#logout').hidden = !user;

@@ -51,7 +51,7 @@ Les réponses et modèles sont affichés côte à côte. Le texte renvoyé est a
 
 Après une comparaison réussie, l'utilisateur peut choisir une réponse préférée, les juger équivalentes ou indiquer qu'aucune ne convient. Une question facultative sur l'utilité apparaît ensuite. Les avis sont modifiables et n'empêchent jamais de continuer.
 
-Les appels sont réels et peuvent consommer les quotas des fournisseurs. Il n'y a pas de conversation suivie ni d'historique affiché. Les KPI sont disponibles dans une API administrateur, sans tableau de bord graphique : voir [KPI.md](KPI.md).
+Les appels sont réels et peuvent consommer les quotas des fournisseurs. Il n'y a pas de conversation suivie ni d'historique affiché. Les KPI sont consultables sur `/admin/stats`, accessible par le lien « Statistiques administrateur » pour les comptes administrateurs. Ils restent également disponibles dans l'API `/stats` : voir [KPI.md](KPI.md).
 
 ## Vérification manuelle
 

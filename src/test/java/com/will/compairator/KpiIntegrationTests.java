@@ -91,6 +91,8 @@ class KpiIntegrationTests {
     @Test void authenticationCsrfAndLogoutAreEnforced() throws Exception {
         assertEquals(401, post("/ai/compare", "{}").statusCode());
         assertEquals(401, request("GET", "/stats", null, null).statusCode());
+        assertEquals(401, request("GET", "/admin/stats", null, null).statusCode());
+        assertEquals(401, request("GET", "/compairator-ui/admin.html", null, null).statusCode());
         HttpRequest withoutCsrf = HttpRequest.newBuilder(URI.create("http://localhost:" + port + "/auth/register"))
                 .header("Content-Type", "application/json").POST(HttpRequest.BodyPublishers.ofString("{}")).build();
         assertEquals(403, client.send(withoutCsrf, HttpResponse.BodyHandlers.ofString()).statusCode());
@@ -99,6 +101,8 @@ class KpiIntegrationTests {
         assertNotNull(users.findByEmail("user@example.com").orElseThrow().getLastLoginAt());
         assertNotEquals("a secure password 123", users.findByEmail("user@example.com").orElseThrow().getPasswordHash());
         assertEquals(403, request("GET", "/stats", null, null).statusCode());
+        assertEquals(403, request("GET", "/admin/stats", null, null).statusCode());
+        assertEquals(403, request("GET", "/compairator-ui/admin.html", null, null).statusCode());
         assertEquals(204, post("/auth/logout", "{}").statusCode());
         token();
         assertEquals(401, post("/ai/chat", "{\"prompt\":\"hello\",\"provider\":\"GROQ\"}").statusCode());
@@ -164,6 +168,10 @@ class KpiIntegrationTests {
         var admin = users.findByEmail("admin@example.com").orElseThrow();
         admin.setRole("ADMIN"); users.saveAndFlush(admin);
         post("/auth/logout", "{}"); token(); login("admin@example.com");
+        HttpResponse<String> dashboard = request("GET", "/admin/stats", null, null);
+        assertEquals(200, dashboard.statusCode());
+        assertTrue(dashboard.body().contains("Les chiffres du projet."));
+        assertEquals(200, request("GET", "/compairator-ui/admin.html", null, null).statusCode());
         HttpResponse<String> response = request("GET", "/stats", null, null);
         assertEquals(200, response.statusCode(), response.body());
         JsonNode stats = json.readTree(response.body());

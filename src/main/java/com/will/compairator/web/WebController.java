@@ -7,6 +7,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 public class WebController {
 
+    @GetMapping({"/admin/stats", "/admin/stats/"})
+    public String statistics() {
+        return "forward:/compairator-ui/admin.html";
+    }
+
     @GetMapping({"/", "/web", "/web/"})
     public String index() {
         return "forward:/compairator-ui/index.html";

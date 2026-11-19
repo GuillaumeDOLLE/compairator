@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Compairator — Statistiques administrateur</title>
+  <link rel="stylesheet" href="/compairator-ui/styles.css">
+  <link rel="stylesheet" href="/compairator-ui/admin.css">
+  <script src="/compairator-ui/admin.js" defer></script>
+</head>
+<body>
+  <header><a href="/web" class="brand">comp<span>ai</span>rator<span class="dot">.</span></a><a href="/web">Retour aux comparaisons</a></header>
+  <main>
+    <section class="intro"><p class="eyebrow">ADMINISTRATION</p><h1>Les chiffres du projet.</h1><p>Adoption, utilisation et retours des utilisateurs. Données réservées aux administrateurs.</p></section>
+    <form id="period-form">
+      <div class="period-fields">
+        <label>Du<input id="from" type="date" required></label>
+        <label>Au, inclus<input id="to" type="date" required></label>
+        <button type="submit">Actualiser les statistiques</button>
+      </div>
+      <p class="muted">Journées en UTC · 366 jours maximum · La journée en cours est partielle.</p>
+    </form>
+    <p id="stats-status" role="status" aria-live="polite">Chargement des statistiques…</p>
+    <p id="stats-error" role="alert" hidden></p>
+    <section id="stats-content" hidden>
+      <h2>Les indicateurs clés</h2>
+      <div id="kpi-cards" class="kpi-grid"></div>
+      <h2>Qualité de service et participation</h2>
+      <div id="service-cards" class="kpi-grid"></div>
+      <h2>Tokens et coûts</h2>
+      <p class="muted">Les tokens correspondent aux nouveaux appels fournisseurs. Le cache ne consomme aucun nouveau token. Un coût inconnu ne signifie pas un coût nul.</p>
+      <div id="cost-cards" class="kpi-grid"></div>
+      <h2>Activité quotidienne</h2>
+      <div id="daily-table" class="table-wrap"></div>
+      <h2>Préférences par type de tâche</h2>
+      <p class="muted">Avis volontaires uniquement. Les réponses jugées équivalentes ou insatisfaisantes ne donnent de victoire à aucun modèle.</p>
+      <div id="preferences-table" class="table-wrap"></div>
+      <h2>Utilisation par utilisateur</h2>
+      <p class="muted">Identifiants internes uniquement. Aucun mot de passe, question ou contenu de réponse n’est affiché.</p>
+      <div id="users-table" class="table-wrap"></div>
+      <p class="muted">Les avis restent modifiables. Les résultats historiques ne reconstruisent pas les versions précédentes d’un avis.</p>
+    </section>
+  </main>
+</body>
+</html>

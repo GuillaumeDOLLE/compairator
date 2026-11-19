@@ -10,7 +10,9 @@ UPDATE app_user SET role = 'ADMIN' WHERE email = 'administrateur@example.com';
 
 Se déconnecter puis se reconnecter après ce changement. L'API `GET /stats` est réservée au rôle `ADMIN`. Un utilisateur ordinaire reçoit 403 et un visiteur non connecté reçoit 401.
 
-Pour consulter les statistiques, ouvrir `/stats` dans le navigateur connecté en administrateur, ou appeler `/stats?from=2026-11-01&to=2026-11-19` avec la même session. L'API ne renvoie ni mots de passe, ni questions, ni réponses IA.
+Pour consulter les statistiques, utiliser le lien « Statistiques administrateur » affiché après connexion avec un compte administrateur, ou ouvrir `/admin/stats`. La page présente les indicateurs, un filtre de dates inclusives, les données quotidiennes, les préférences par tâche et la consommation par utilisateur. La page et son accès HTML direct sont protégés côté serveur.
+
+Pour accéder au JSON, ouvrir `/stats` ou appeler `/stats?from=2026-11-01&to=2026-11-19` avec la même session. L'API ne renvoie ni mots de passe, ni questions, ni réponses IA. Le formulaire convertit la date de fin inclusive vers la borne exclusive attendue par cette API.
 
 ## Périodes et définitions
 
